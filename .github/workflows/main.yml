@@ -53,17 +53,19 @@ jobs:
           cd ~/kernel
           export ARCH=arm64
           make clean && make mrproper
-          make bluefly_a51_defconfig
-          make -j$(nproc --all) CROSS_COMPILE=$HOME/toolchain/bin/aarch64-linux-android- CC=$HOME/clang/bin/clang CLANG_TRIPLE=aarch64-linux-gnu-
+          make bluefly_a51_defconfig O=a51
+          make bluefly_m31_defconfig O=m31
+          make -j$(nproc --all) CROSS_COMPILE=$HOME/toolchain/bin/aarch64-linux-android- CC=$HOME/clang/bin/clang CLANG_TRIPLE=aarch64-linux-gnu- O=a51
+          make -j$(nproc --all) CROSS_COMPILE=$HOME/toolchain/bin/aarch64-linux-android- CC=$HOME/clang/bin/clang CLANG_TRIPLE=aarch64-linux-gnu- O=m31
 
       # Upload to TG
-      - name: Upload
-        env:
-          CHAT_ID: ${{ secrets.CHAT_ID }}
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          DEVICE_NAME: a51
-        run: |
-          cd ~/kernel/arch/arm64/boot
-          ZIPNAME=KERNEL_${DEVICE_NAME}_$(date +%d%m%y)_TWRP.zip
-          zip -r9 $ZIPNAME Image
-          curl -F chat_id=$CHAT_ID -F document=@$ZIPNAME -F parse_mode=markdown https://api.telegram.org/bot$BOT_TOKEN/sendDocument
+      #- name: Upload
+      #  env:
+      #    CHAT_ID: ${{ secrets.CHAT_ID }}
+      #    BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      #    DEVICE_NAME: a51
+      #  run: |
+      #    cd ~/kernel/arch/arm64/boot
+      #    ZIPNAME=KERNEL_${DEVICE_NAME}_$(date +%d%m%y)_TWRP.zip
+      #    zip -r9 $ZIPNAME Image
+      #          curl -F chat_id=$CHAT_ID -F document=@$ZIPNAME -F parse_mode=markdown https://api.telegram.org/bot$BOT_TOKEN/sendDocument
