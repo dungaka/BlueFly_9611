@@ -58,6 +58,18 @@ jobs:
           make -j$(nproc --all) CROSS_COMPILE=$HOME/toolchain/bin/aarch64-linux-android- CC=$HOME/clang/bin/clang CLANG_TRIPLE=aarch64-linux-gnu- O=a51
           make -j$(nproc --all) CROSS_COMPILE=$HOME/toolchain/bin/aarch64-linux-android- CC=$HOME/clang/bin/clang CLANG_TRIPLE=aarch64-linux-gnu- O=m31
 
+      # Create dtb(o) cfg
+      - name: Build dtbo & add CFG entry
+        run: |
+          cd ~/kernel
+          cp a51/arch/arm64/boot/dts/exynos/exynos9610.dtb . # use a51 for dtb, but basically same
+          python scripts/mkdtboimg.py create dtbo-m31.img m31/arch/arm64/boot/dts/samsung/*.dtbo
+          python scripts/mkdtboimg.py create dtbo-a51.img a51/arch/arm64/boot/dts/samsung/*.dtbo
+          python scripts/mkdtboimg.py cfg_create dtb dtbcfg/exynos9610.cfg --dtb-dir a51/arch/arm64/boot/dts/exynos/
+          python scripts/mkdtboimg.py cfg_create dtbo-a51.img dtbcfg/a51.cfg --dtb-dir a51/arch/arm64/boot/dts/samsung/
+          python scripts/mkdtboimg.py cfg_create dtbo-m31.img dtbcfg/m31.cfg --dtb-dir m31/arch/arm64/boot/dts/samsung/
+
+
       # Upload to TG
       - name: Upload
         env:
