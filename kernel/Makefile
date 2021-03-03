@@ -122,7 +122,17 @@ obj-$(CONFIG_FAST_TRACK) += ftt/
 $(obj)/configs.o: $(obj)/config_data.h
 
 targets += config_data.gz
+
+
+ifeq ($(CONFIG_EXYNOS9611_A51),y)
+# Show stock A51 config to config.gz
+$(obj)/config_data.gz: arch/arm64/configs/stock/exynos9610-a51xx_defconfig FORCE
+# Show stock M31 config to config.gz
+else ifeq ($(CONFIG_EXYNOS9611_M31),y)
+$(obj)/config_data.gz: arch/arm64/configs/stock/exynos9610-m31dd_defconfig FORCE
+else
 $(obj)/config_data.gz: $(KCONFIG_CONFIG) FORCE
+endif
 	$(call if_changed,gzip)
 
       filechk_ikconfiggz = (echo "static const char kernel_config_data[] __used = MAGIC_START"; cat $< | scripts/basic/bin2c; echo "MAGIC_END;")
