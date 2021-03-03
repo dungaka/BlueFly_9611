@@ -69,19 +69,35 @@ jobs:
           python scripts/mkdtboimg.py cfg_create dtbo-a51.img dtbcfg/a51.cfg --dtb-dir a51/arch/arm64/boot/dts/samsung/
           python scripts/mkdtboimg.py cfg_create dtbo-m31.img dtbcfg/m31.cfg --dtb-dir m31/arch/arm64/boot/dts/samsung/
 
+      # Create img
+      - name: Create image
+        run: |
+          cd ~
+          git clone https://github.com/hendramanu/AIK-Linux AIK && cd AIK
+          git checkout a51
+          ./unpackimg.sh boot.img
+          cd split_img
+          cp ~/kernel/a51/arch/arm64/boot/Image boot.img-zImage
+          cp ~/kernel/dtb boot.img-dtb
+          cd .. && ./repackimg.sh
+          mv image-new.img BlueFly_1.0_a51-$(date +%d%m%y).img
+
+          ./unpackimg.sh boot.img
+          cd split_img
+          cp ~/kernel/m31/arch/arm64/boot/Image boot.img-zImage
+          cp ~/kernel/dtb boot.img-dtb
+          cd .. && ./repackimg.sh
+          mv image-new.img BlueFly_1.0_m31-$(date +%d%m%y).img
+
+          cp ~/kernel/dtbo-* .
 
       # Upload to TG
       - name: Upload
         env:
           CHAT_ID: ${{ secrets.CHAT_ID }}
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          DEVICE_NAME_1: a51
-          DEVICE_NAME_2: m31
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }} 
         run: |
-          cd ~/kernel/
-          ZIPNAME=KERNEL_${DEVICE_NAME_1}_$(date +%d%m%y).zip
-          zip -r9 $ZIPNAME a51/arch/arm64/boot/Image dtb dtbo-a51.img
-          curl -F chat_id=$CHAT_ID -F document=@$ZIPNAME -F parse_mode=markdown https://api.telegram.org/bot$BOT_TOKEN/sendDocument
-          ZIPNAME=KERNEL_${DEVICE_NAME_2}_$(date +%d%m%y).zip
-          zip -r9 $ZIPNAME m31/arch/arm64/boot/Image dtb dtbo-m31.img
-          curl -F chat_id=$CHAT_ID -F document=@$ZIPNAME -F parse_mode=markdown https://api.telegram.org/bot$BOT_TOKEN/sendDocument
+          cd ~/AIK
+          for i in BlueFly*.img dtbo*.img; do
+          curl -F chat_id=$CHAT_ID -F document=@$i -F parse_mode=markdown https://api.telegram.org/bot$BOT_TOKEN/sendDocument
+          done
