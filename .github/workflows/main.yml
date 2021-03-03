@@ -75,9 +75,13 @@ jobs:
         env:
           CHAT_ID: ${{ secrets.CHAT_ID }}
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          DEVICE_NAME: m31
+          DEVICE_NAME_1: a51
+          DEVICE_NAME_2: m31
         run: |
-          cd ~/kernel/m31/arch/arm64/boot
-          ZIPNAME=KERNEL_${DEVICE_NAME}_$(date +%d%m%y).zip
-          zip -r9 $ZIPNAME Image
+          cd ~/kernel/
+          ZIPNAME=KERNEL_${DEVICE_NAME_1}_$(date +%d%m%y).zip
+          zip -r9 $ZIPNAME a51/arch/arm64/boot/Image dtb dtbo-a51.img
+          curl -F chat_id=$CHAT_ID -F document=@$ZIPNAME -F parse_mode=markdown https://api.telegram.org/bot$BOT_TOKEN/sendDocument
+          ZIPNAME=KERNEL_${DEVICE_NAME_2}_$(date +%d%m%y).zip
+          zip -r9 $ZIPNAME m31/arch/arm64/boot/Image dtb dtbo-m31.img
           curl -F chat_id=$CHAT_ID -F document=@$ZIPNAME -F parse_mode=markdown https://api.telegram.org/bot$BOT_TOKEN/sendDocument
