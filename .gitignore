@@ -125,3 +125,11 @@ all.config
 
 # fetched Android config fragments
 kernel/configs/android-*.cfg
+
+# @hendramanu 's artifact, hehe
+*.rej
+*.orig
+*.patch
+*.diff
+a51/
+m31/
