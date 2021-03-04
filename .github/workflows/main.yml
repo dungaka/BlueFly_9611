@@ -80,14 +80,14 @@ jobs:
           cp ~/kernel/a51/arch/arm64/boot/Image boot.img-zImage
           cp ~/kernel/dtb boot.img-dtb
           cd .. && ./repackimg.sh
-          mv image-new.img BlueFly_1.0_a51-$(date +%d%m%y).img
+          mv image-new.img BlueFly_1.0_a51.img
 
           ./unpackimg.sh boot.img
           cd split_img
           cp ~/kernel/m31/arch/arm64/boot/Image boot.img-zImage
           cp ~/kernel/dtb boot.img-dtb
           cd .. && ./repackimg.sh
-          mv image-new.img BlueFly_1.0_m31-$(date +%d%m%y).img
+          mv image-new.img BlueFly_1.0_m31.img
 
           cp ~/kernel/dtbo-* .
 
